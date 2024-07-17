@@ -14,7 +14,7 @@
 * 元ソースはronron-ghさんの下記作品です。但し顔認識は無効です。
   [AI_StackChan2_DevCam](https://github.com/ronron-gh/AI_StackChan2_DevCam)
 * 無言のときの吹き出しに時刻を表示します。
-* HexLED制御はronron-ghさんの下記作品のコードです。
+* HexLED制御の基本はronron-ghさんの下記作品のコードです。
   [AI_StackChan2_FuncCall](https://github.com/ronron-gh/AI_StackChan2_FuncCall)
 * 独り言はソースコードで有効に固定しています。
 * 無操作が続くと独り言が減り、最終的にはシャットダウンします。
