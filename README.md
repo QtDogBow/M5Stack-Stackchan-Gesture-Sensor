@@ -4,8 +4,6 @@
 
 ![alt text](IMG2-1.jpg)
 
-[ENGLISH](README.md)
-
 ## 機能
 * Gesture Sensor (PAJ7620U2搭載)をPortAに接続し、手を振った方向（上下左右）に動かします。
   Gesture Sensor を利用するときはHexLEDを利用できません。（接続しないでください）
