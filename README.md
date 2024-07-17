@@ -5,7 +5,8 @@
 ![alt text](IMG2-1.jpg)
 
 ## 機能
-* Gesture Sensor (PAJ7620U2搭載)をPortAに接続し、手を振った方向（上下左右）に動かします。
+* 独り言機能を充実させました。HexLEDを生かし、Gesture Sensorを使わないのが推奨です。
+* Gesture Sensor (PAJ7620U2搭載)を使う場合はPortAに接続し、手を振った方向（上下左右）に動かします。
   Gesture Sensor を利用するときはHexLEDを利用できません。（接続しないでください）
 * M5Stack用ボタンユニット [U027]をPortBに接続し、短押しで音声認識、長押しでシャットダウンさせます。
 * OpenAIのfunction callingを使いHexLEDと天気予報を利用できます。
