@@ -383,7 +383,7 @@ tm timeInfo;
   uint PB_IN0_released_millis = 0;
   int PB_IN0_prev_state = HIGH;  //press = LOW (0V)
   const uint PRESS_TIME_TO_SHUTDOWN = 5000;
-  const uint PRESS_TIME_TO_TALK = 100;
+  const uint PRESS_TIME_TO_TALK = 1000;
 #endif //ENABLE_GROVE_BUTTON
 
 #if defined( ENABLE_HEX_LED ) //2024.05.15 追加
@@ -446,7 +446,7 @@ void LedPanel(int pattern)
   else return;
 }
 
-String LedPictWord[] = {"雨","花","虫","飛行機","温泉","死","魚","？","驚","宇宙船","ロボット","イカ","コーヒー","珈琲","きのこ","烏賊","宇宙人","日本","MAX"};
+String LedPictWord[] = {"雨","花","虫","飛行機","温泉","骨","魚","？","驚","宇宙船","ロボット","イカ","コーヒー","珈琲","きのこ","烏賊","宇宙人","日本","MAX"};
 int LedPictWord_max = 0;
 void wordToLedPanel(string str)
 {
@@ -455,7 +455,7 @@ void wordToLedPanel(string str)
   else if(str.find(LedPictWord[2].c_str()) != string::npos) hex_led_ptn_SNAIL();//"虫"
   else if(str.find(LedPictWord[3].c_str()) != string::npos) hex_led_ptn_PLANE();//"飛行機"
   else if(str.find(LedPictWord[4].c_str()) != string::npos) hex_led_ptn_HOT_SPRING();//"温泉"
-  else if(str.find(LedPictWord[5].c_str()) != string::npos) hex_led_ptn_SCULL();//"死"
+  else if(str.find(LedPictWord[5].c_str()) != string::npos) hex_led_ptn_SCULL();//"骨"
   else if(str.find(LedPictWord[6].c_str()) != string::npos) hex_led_ptn_FISH();//"魚"
   else if(str.find(LedPictWord[7].c_str()) != string::npos) hex_led_ptn_QUESTION();//"？"
   else if(str.find(LedPictWord[8].c_str()) != string::npos) hex_led_ptn_DBL_QUOTATION();//"驚"
@@ -624,7 +624,11 @@ void handle_speech() {
 //---------------------------------------- begin
 String prompt = "You are helpful assistant.";
 String inputText = "明日の天気を教えて下さい。";  //fanction callingで関数を選択するように質問を変更する。
-String model = "gpt-3.5-turbo";
+//String model = "gpt-3.5-turbo";
+String model = "gpt-4o-mini";//2024.06.19 3.5 turboより高性能で低価格。
+//情報は新しくなった。日本の総理を岸田文雄と答えるようになった。
+//5W1H形式は全てエラーになるようだ。
+
 int maxTokens = 600;//2024.07.14 100->600
 float temperature = 1;
 float top_p = 1;
@@ -739,7 +743,7 @@ String https_post_json(const char* url, const char* json_string, const char* roo
   return payload;
 }
 
-String chatGpt(String json_string) {
+String chatGpt(String json_string, String model = "gpt-4o-mini") {
   String response = "";;
   avatar.setExpression(Expression::Doubt);
   avatar.setSpeechText("考え中…");
@@ -751,6 +755,11 @@ String chatGpt(String json_string) {
     doc.clear();
     error = deserializeJson(doc, json_ChatString);
     doc["messages"][1]["content"] = text;
+
+    //doc["model"] = "gpt-3.5-turbo";//2024.07.19
+    //doc["model"] = "gpt-4o-mini";
+    if(model != "") doc["model"] = model;
+
     json_string ="";
     serializeJson(doc, json_string);
 
@@ -935,7 +944,7 @@ void handle_chat() {
   server.send(200, "text/html", String(HEAD)+String("<body>")+response+String("</body>"));
 }
 
-void exec_chatGPT(String text) {
+void exec_chatGPT(String text, String model = "gpt-4o-mini") {
   static String response = "";
   Serial.println(InitBuffer);
   init_chat_doc(InitBuffer.c_str());
@@ -982,7 +991,7 @@ void exec_chatGPT(String text) {
 
   if(speech_text=="" && speech_text_buffer == "") {
     Serial.println("exec_chatGpt --> chatGpt(json_string)");
-    response = chatGpt(json_string);
+    response = chatGpt(json_string, model);
     speech_text = response;
     // 返答をチャット履歴に追加
     chatHistory.push_back(response);
@@ -2390,7 +2399,7 @@ servo_home = true;//ジェスチャー有効のときはランダムなサーボ
       //2024.07.06 5W1Hの単語をランダムに入れ替えた文章でchatGPTに物語を作成させ、独り言として話す。
      if(10 - random(10) > 5)
      {
-        exec_chatGPT(random_words[random(random_words_max)]);//2024.07.14
+        exec_chatGPT(random_words[random(random_words_max)], "gpt-4o-mini");//2024.07.14
      }
      else
      {
@@ -2414,7 +2423,7 @@ servo_home = true;//ジェスチャー有効のときはランダムなサーボ
                     
         //Voicevox_tts((char*)str.c_str(), (char*)TTS_PARMS.c_str());
 
-        exec_chatGPT(str);
+        exec_chatGPT(str, "gpt-3.5-turbo");
      }
       /////////////////////
 #if defined( ENABLE_HEX_LED )
@@ -2539,35 +2548,25 @@ servo_home = true;//ジェスチャー有効のときはランダムなサーボ
   M5.update();
  
   bool flag_talk = false;
+
 #if defined( ENABLE_GROVE_BUTTON )
   //2024.05.20 Button unit [U027]のテスト
   bool flag_shutdown = false;
   uint millis_now = millis();
-  if(digitalRead(PB_IN0)==LOW)  {//ボタンが押されている
-
-    if(PB_IN0_prev_state == HIGH) {//今押された
-      PB_IN0_pressed_millis = millis_now;
-    }
-    if(millis_now - PB_IN0_pressed_millis > PRESS_TIME_TO_SHUTDOWN) {//長押し
-      flag_shutdown = true; // → シャットダウン
-    }
+  if(digitalRead(PB_IN0)==LOW)  {// ↓↓↓ ボタンが押されている
+    if(PB_IN0_prev_state == HIGH) PB_IN0_pressed_millis = millis_now;//今押された ---↓_
+    //押し続けているときに長押し判定する。
+    if(millis_now - PB_IN0_pressed_millis > PRESS_TIME_TO_SHUTDOWN) flag_shutdown = true; // → シャットダウン
     PB_IN0_prev_state = LOW;
-
   } else {//ボタンが離れている
-
     if(PB_IN0_prev_state == LOW) {//今離された
-      PB_IN0_released_millis = millis_now;
-      if(millis_now - PB_IN0_released_millis < PRESS_TIME_TO_TALK) {//短押し
-        flag_talk = true;// → 音声認識
-      }
+      PB_IN0_released_millis = millis_now;  //これは使わない
+      //離されたときに短押し判定する。
+      if(millis_now - PB_IN0_pressed_millis < PRESS_TIME_TO_TALK) flag_talk = true;//短押し → 音声認識
     }
     PB_IN0_prev_state = HIGH;
-
   }
-
   if(flag_shutdown) shutdown(0);
-  //else if(flag_talk) ;//後で考える。
-
 #endif  // ENABLE_GROVE_BUTTON
 
 #if defined(ARDUINO_M5STACK_Core2) || defined( ARDUINO_M5STACK_CORES3 )

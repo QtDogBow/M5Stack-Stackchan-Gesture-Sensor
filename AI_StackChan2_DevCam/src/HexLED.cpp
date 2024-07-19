@@ -358,15 +358,15 @@ C4,C0,C0,C0,C0,C0,C4,
    C0,C4,C4,C4,C0,
      C0,C0,C0,C0
 };
-//2024.07.15 どくろ
+//2024.07.15 骨
 const CRGB led_pat_SCULL[NUM_LEDS] = {
     C5,C5,C5,C5,
    C5,C5,C5,C5,C5,
- C5,C0,C5,C5,C0,C5,
-C5,C0,C0,C5,C0,C0,C5,
-  C5,C5,C5,C5,C5,C5,
-   C6,C5,C6,C5,C6,
-     C6,C5,C5,C6
+ C5,C4,C5,C5,C4,C5,
+C0,C5,C5,C0,C5,C5,C0,
+  C0,C5,C5,C5,C5,C0,
+   C0,C0,C0,C0,C0,
+     C5,C5,C5,C5
 };
 //2024.07.15 魚
 const CRGB led_pat_FISH[NUM_LEDS] = {
