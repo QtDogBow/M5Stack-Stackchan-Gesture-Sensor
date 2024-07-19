@@ -5,6 +5,7 @@
 ![alt text](IMG2-1.jpg)
 
 ## 機能
+* chatGPT 3.5 turbo と4o miniをミックスして呼び出します。4o miniは無理やりな物語を創造してくれないようです。
 * 独り言機能を充実させました。HexLEDを生かし、Gesture Sensorを使わないのが推奨です。
 * Gesture Sensor (PAJ7620U2搭載)を使う場合はPortAに接続し、手を振った方向（上下左右）に動かします。
   Gesture Sensor を利用するときはHexLEDを利用できません。（接続しないでください）
